@@ -14,58 +14,74 @@ async function getData() {
 }
 
 function createDiv() {
-    return document.createElement("div");
+    return document.createElement('div');
 }
 
 function createInput() {
-    return document.createElement("input");
+    return document.createElement('input');
 }
 
 function createImg() {
-    return document.createElement("img");
+    return document.createElement('img');
 }
 
 function createContainer() {
     const container = createDiv();
-    container.setAttribute("class", "container");
+    container.setAttribute('class', 'container');
     document.body.appendChild(container);
 
     const card = createDiv();
-    card.setAttribute("class", "card");
+    card.setAttribute('class', 'card');
     container.appendChild(card);
 
     const input = createInput();
-    input.setAttribute("class", "input");
-    input.setAttribute("placeholder", "Search Rick and Morty character...");
+    input.setAttribute('class', 'input');
+    input.setAttribute('id', 'input');
+    input.setAttribute('placeholder', 'Search Rick and Morty character...');
     card.appendChild(input);
 
     const content = createDiv();
-    content.setAttribute("class", "content");
+    content.setAttribute('class', 'content');
     card.appendChild(content);
 
-    async function renderContent() {
-        const data = await getData();
-        if (!data || !data.results) return;
+    let characters = [];
 
-        const { results } = data;
+    function displayCharacters(list) {
+        content.innerHTML = '';
 
-        results.forEach(element => {
+        list.forEach(element => {
             const { name, image } = element;
-            
             const item = createDiv();
-            item.setAttribute("class", "character-item");
+            item.setAttribute('class', 'character-item');
 
             const img = createImg();
-            img.setAttribute("src", image);
-            img.setAttribute("alt", name);
+            img.setAttribute('src', image);
+            img.setAttribute('alt', name);
+            img.setAttribute('style', 'color: white;');
 
-            const nameTag = document.createElement("p");
+            const nameTag = document.createElement('p');
             nameTag.textContent = name;
 
             item.appendChild(img);
             item.appendChild(nameTag);
             content.appendChild(item);
         });
+    }
+
+    input.addEventListener('input', (event) => {
+        const query = event.target.value.trim().toLowerCase();
+        const filtered = characters.filter(char => 
+            char.name.toLowerCase().includes(query)
+        );
+        displayCharacters(filtered);
+    });
+
+    async function renderContent() {
+        const data = await getData();
+        if (!data || !data.results) return;
+
+        characters = data.results;
+        displayCharacters(characters);
     }
 
     renderContent();
